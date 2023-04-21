@@ -1,0 +1,48 @@
+---
+- name: Download files from S3 bucket
+  hosts: all
+  become: yes
+  vars:
+      # Set the name of the S3 bucket
+    - s3_bucket_name: "carro-cv-artifacts"
+      # Set the prefix for the S3 objects to download
+    - s3_object_prefix: "damage_detection/panel-level/dent/data"
+      # Set the local destination directory for the downloaded files
+    - local_dir_path: "/home/ubuntu/data"
+
+  tasks:
+
+    - name: create data directories
+      file:
+        path: "{{ item }}"
+        recurse: yes
+        state: directory
+      loop: 
+        - /home/ubuntu/data/images/train
+        - /home/ubuntu/data/images/val
+        - /home/ubuntu/data/images/test
+        - /home/ubuntu/data/annotations
+
+    - name: Remove lock file
+      shell: sudo rm /var/lib/dpkg/lock-frontend
+      ignore_errors: true
+
+    - name: Register list of files from s3
+      amazon.aws.aws_s3:
+        mode: list
+        bucket: "{{ s3_bucket_name }}"
+        prefix: "{{ s3_object_prefix }}"
+        # gives a list of items
+      register: s3_bucket_items
+
+    - name: Download files from s3
+      aws_s3:
+        mode: get
+        bucket: "{{ s3_bucket_name }}"
+        prefix: "{{ s3_object_prefix }}"
+        object: "{{ item }}"
+        dest: "/home/ubuntu/data{{ item | split('/data') | last }}"
+      with_items: "{{ s3_bucket_items.s3_keys }}"
+      ignore_errors: true
+
+
