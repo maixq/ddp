@@ -46,7 +46,6 @@ resource "aws_instance" "ddp-instance" {
     user_data = <<EOF
     #!/bin/bash
     echo "Copying SSH key to master and worker nodes"
-    echo -e "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCWYaUN8RgxwKXBL1SafEziy6u786kAb+TupmQfpFSiGZ8DzVtqWYvuo9PvMExTjye3Z5wX6rRdPDNQtO1ehJhA+6K6NPipY/zLLfUpZQ2+8KAuQqXGqTdSV2A3N8ZJLPYBUgl00EEypw5Vi1nK7QjxkCKQpQKwJkd380XI8IHJKl9maOOIloGzMhMzHx1vvk3vjR7eArhnNOxozGCMi91sRyIS1UldfUBRhyhe1sfRagwhvg+vQNUiPCwSeuOG0BTeWzZBcLV2BTSeyNPW9UAx/Ggxk9H407b3Z0PXrqjVxXBnRhn1I9Kof+jvSpKUYK9c0jUtCAkyyrSfmlW+NkDp xueqiao" >> /home/ubuntu/.ssh/authorized_keys
     
     echo "Copying hostname to ${each.value.instance_name}"
     hostname ${each.value.instance_name}
