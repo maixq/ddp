@@ -15,21 +15,19 @@
       shell: pip install torch==1.10.0+cu111 torchvision==0.11.0+cu111 torchaudio==0.10.0 -f https://download.pytorch.org/whl/torch_stable.html;
       when: torch_check.changed
 
-    - name: Check if detectron2 is installed
-      pip:
-        name: detectron2
-        state: present
-      register: detectron2_check
-    
+    - name: register detectron2 if it exists
+      command: python3 -m detectron2.utils.collect_env
+      register: result
+      ignore_errors: true
+
     - name: Install detectron2
       shell: python3 -m pip install detectron2 -f \
               https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.10/index.html
-      when: detectron2_check.changed
-
+      when: result is failed
+      
     - name: Install other packages
       pip:
         name: 
           - opencv-python==4.5.5.64
-          - setuptools==59.5.0
           - numpy
-        state: present
+        state: forcereinstall
